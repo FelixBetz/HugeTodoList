@@ -1,24 +1,78 @@
 <script lang="ts">
-	import { Button } from 'sveltestrap/src';
+	import { onMount } from 'svelte';
+	import { Alert, Button, FormGroup, Label, Input } from 'sveltestrap/src';
 
-	function showNotification() {
-		const title = 'Test: ' + Date.now().toString();
-		new Notification(title, { body: 'test tests' });
+	let alerts: string[] = [];
+
+	let time: string;
+	let date: string;
+
+	function showAlert(message: string, time: number) {
+		alerts[alerts.length] = message;
+		setTimeout(() => {
+			alerts = alerts.slice(1);
+		}, time);
 	}
 
-	function checkNotification() {
-		console.log(Notification.permission);
+	function showNotification(message: string) {
+		console.log('notify test');
+		const title = 'Test: ' + Date.now().toString();
+		new Notification(title, { body: message });
+	}
+
+	function checkNotificationPermission() {
 		window.Notification.requestPermission();
-		if (Notification.permission === 'granted') {
-			showNotification();
-		} else if (Notification.permission !== 'denied') {
-			Notification.requestPermission().then((permission) => {
-				if (permission === 'granted') {
-					showNotification();
-				}
-			});
+	}
+	onMount(async () => {
+		checkNotificationPermission();
+	});
+	function createNotification() {
+		if (time == '' || date == '') {
+			return;
+		}
+		const notificationDate = new Date(date + 'T' + time + ':00');
+
+		const now = Date.now();
+		const timeDiff = notificationDate.getTime() - now;
+
+		if (timeDiff > 0) {
+			let notificationString =
+				'add Notification: ' +
+				notificationDate.toLocaleDateString() +
+				' ' +
+				notificationDate.toLocaleTimeString();
+			showAlert(notificationString, 5000);
+			setTimeout(() => {
+				showNotification(notificationString);
+			}, timeDiff);
 		}
 	}
 </script>
 
-<Button color="danger" on:click={checkNotification}>send Notification</Button>
+{#each alerts as alert}
+	<Alert color="primary" isOpen={true} fade={true}>
+		{alert}
+	</Alert>
+{/each}
+
+<FormGroup>
+	<Label for="exampleDate">Date</Label>
+	<Input
+		type="date"
+		name="date"
+		id="exampleDate"
+		placeholder="date placeholder"
+		bind:value={date}
+	/>
+</FormGroup>
+<FormGroup>
+	<Label for="exampleTime">Time</Label>
+	<Input
+		type="time"
+		name="time"
+		id="exampleTime"
+		placeholder="time placeholder"
+		bind:value={time}
+	/>
+</FormGroup>
+<Button color="danger" on:click={createNotification}>send Notification</Button>
