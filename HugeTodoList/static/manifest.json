@@ -1,6 +1,6 @@
 {
-	"short_name": "svelte-pwa",
-	"name": "svelte-test-pwa",
+	"short_name": "Todo",
+	"name": "HugeTodoList",
 	"start_url": "/",
 	"icons": [
 		{
@@ -21,20 +21,8 @@
 			"url": "/today?source=pwa",
 			"icons": [
 				{
-					"src": "/icons/logo_192.png",
-					"sizes": "192x192"
-				}
-			]
-		},
-		{
-			"name": "How's weather tomorrow?",
-			"short_name": "Tomorrow",
-			"description": "View weather information for tomorrow",
-			"url": "/tomorrow?source=pwa",
-			"icons": [
-				{
-					"src": "/icons/logo_192.png",
-					"sizes": "192x192"
+					"src": "favicon.png",
+					"sizes": "128x128"
 				}
 			]
 		}
