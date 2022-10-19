@@ -37,7 +37,7 @@
 
 		if (timeDiff > 0) {
 			let notificationString =
-				'add Notification: ' +
+				'add Notifications: ' +
 				notificationDate.toLocaleDateString() +
 				' ' +
 				notificationDate.toLocaleTimeString();
