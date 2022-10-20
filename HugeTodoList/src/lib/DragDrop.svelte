@@ -1,4 +1,7 @@
 <script lang="ts">
+	/////////////////////////////////////////////////////////////////////////////
+	//forked from : https://github.com/jwlarocque/svelte-dragdroplist
+	/////////////////////////////////////////////////////////////////////////////
 	import { flip } from 'svelte/animate';
 	import type { TodoItem } from '$lib/interfaces';
 	export let data: TodoItem[] = [];
