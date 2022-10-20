@@ -5,18 +5,16 @@
 
 	let todos: TodoItem[] = [
 		{ id: 0, title: 'Test0', description: '0', isDone: false, categoryId: 0 },
-		{ id: 1, title: 'Test1', description: '1', isDone: false, categoryId: 0 },
+		{ id: 1, title: 'Test1', description: '1', isDone: true, categoryId: 0 },
 		{ id: 2, title: 'Test2', description: '2', isDone: false, categoryId: 1 },
-		{ id: 3, title: 'Test3', description: '3', isDone: false, categoryId: 1 }
+		{ id: 3, title: 'Test3', description: '3', isDone: true, categoryId: 1 }
 	];
-
-	let removesItems = false;
 </script>
 
 <Container>
 	<Row>
-		<Col sm=3>
-			<DragDrop bind:data={todos} {removesItems} />
+		<Col sm="3">
+			<DragDrop bind:data={todos} />
 		</Col>
 	</Row>
 </Container>
