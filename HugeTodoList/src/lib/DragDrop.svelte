@@ -125,10 +125,14 @@
 				data-id={datum.id ? datum.id : JSON.stringify(datum)}
 				data-grabY="0"
 				on:mousedown={function (ev) {
-					grab(ev.clientY, this);
+					if (this instanceof HTMLDivElement) {
+						grab(ev.clientY, this);
+					}
 				}}
 				on:touchstart={function (ev) {
-					grab(ev.touches[0].clientY, this);
+					if (this instanceof HTMLDivElement) {
+						grab(ev.touches[0].clientY, this);
+					}
 				}}
 				on:mouseenter={function (ev) {
 					ev.stopPropagation();
