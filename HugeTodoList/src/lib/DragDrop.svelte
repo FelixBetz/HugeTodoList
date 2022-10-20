@@ -7,13 +7,13 @@
 	let ghost;
 	let grabbed;
 
-	let lastTarget;
+	let lastTarget: Element | null;
 
 	let mouseY = 0; // pointer y coordinate within client
 	let offsetY = 0; // y distance from top of grabbed element to pointer
 	let layerY = 0; // distance from top of list to top of client
 
-	function grab(clientY, element: MouseEvent) {
+	function grab(clientY: number, element) {
 		// modify grabbed element
 		grabbed = element;
 		grabbed.dataset.grabY = clientY;
@@ -28,7 +28,7 @@
 	}
 
 	// drag handler updates cursor position
-	function drag(clientY) {
+	function drag(clientY: number) {
 		if (grabbed) {
 			mouseY = clientY;
 			layerY = ghost.parentNode.getBoundingClientRect().y;
@@ -37,17 +37,17 @@
 
 	// touchEnter handler emulates the mouseenter event for touch input
 	// (more or less)
-	function touchEnter(ev) {
+	function touchEnter(ev: Touch) {
 		drag(ev.clientY);
 		// trigger dragEnter the first time the cursor moves over a list item
 		let target = document.elementFromPoint(ev.clientX, ev.clientY).closest('.item');
-		if (target && target != lastTarget) {
+		/*if (target && target != lastTarget) {
 			lastTarget = target;
 			dragEnter(ev, target);
-		}
+		}*/
 	}
 
-	function dragEnter(_ev, target) {
+	function dragEnter(_ev: MouseEvent | Touch, target) {
 		// swap items in data
 		if (grabbed && target != grabbed && target.classList.contains('item')) {
 			moveDatum(parseInt(grabbed.dataset.index), parseInt(target.dataset.index));
@@ -61,7 +61,7 @@
 		data = [...data.slice(0, to), temp, ...data.slice(to)];
 	}
 
-	function release(_ev) {
+	function release(_ev: MouseEvent | Touch) {
 		grabbed = null;
 	}
 
