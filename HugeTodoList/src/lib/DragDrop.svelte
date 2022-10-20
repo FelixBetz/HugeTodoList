@@ -132,7 +132,9 @@
 				}}
 				on:mouseenter={function (ev) {
 					ev.stopPropagation();
-					dragEnter(ev, ev.target);
+					if (ev.target instanceof HTMLDivElement) {
+						dragEnter(ev, ev.target);
+					}
 				}}
 				on:touchmove={function (ev) {
 					ev.stopPropagation();
