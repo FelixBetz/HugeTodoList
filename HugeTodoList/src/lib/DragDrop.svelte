@@ -47,7 +47,7 @@
 		}
 	}
 
-	function dragEnter(ev, target) {
+	function dragEnter(_ev, target) {
 		// swap items in data
 		if (grabbed && target != grabbed && target.classList.contains('item')) {
 			moveDatum(parseInt(grabbed.dataset.index), parseInt(target.dataset.index));
