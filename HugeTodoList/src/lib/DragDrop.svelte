@@ -4,8 +4,8 @@
 	export let data: TodoItem[] = [];
 	export let removesItems = false;
 
-	let ghost;
-	let grabbed;
+	let ghost: HTMLDivElement;
+	let grabbed: HTMLDivElement | null;
 
 	let lastTarget: Element | null;
 
@@ -13,25 +13,28 @@
 	let offsetY = 0; // y distance from top of grabbed element to pointer
 	let layerY = 0; // distance from top of list to top of client
 
-	function grab(clientY: number, element) {
+	function grab(clientY: number, element: HTMLDivElement) {
 		// modify grabbed element
 		grabbed = element;
-		grabbed.dataset.grabY = clientY;
 
 		// modify ghost element (which is actually dragged)
-		ghost.innerHTML = grabbed.innerHTML;
-
-		// record offset from cursor to top of element
-		// (used for positioning ghost)
-		offsetY = grabbed.getBoundingClientRect().y - clientY;
-		drag(clientY);
+		if (grabbed != null) {
+			grabbed.dataset.grabY = clientY.toString();
+			ghost.innerHTML = grabbed.innerHTML;
+			// record offset from cursor to top of element
+			// (used for positioning ghost)
+			offsetY = grabbed.getBoundingClientRect().y - clientY;
+			drag(clientY);
+		}
 	}
 
 	// drag handler updates cursor position
 	function drag(clientY: number) {
 		if (grabbed) {
 			mouseY = clientY;
-			layerY = ghost.parentNode.getBoundingClientRect().y;
+			if (ghost.parentElement != undefined) {
+				layerY = ghost.parentElement?.getBoundingClientRect().y;
+			}
 		}
 	}
 
@@ -40,17 +43,21 @@
 	function touchEnter(ev: Touch) {
 		drag(ev.clientY);
 		// trigger dragEnter the first time the cursor moves over a list item
-		let target = document.elementFromPoint(ev.clientX, ev.clientY).closest('.item');
-		/*if (target && target != lastTarget) {
-			lastTarget = target;
-			dragEnter(ev, target);
-		}*/
+		let target = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.item');
+		if (target && target instanceof HTMLDivElement) {
+			if (target && target != lastTarget) {
+				lastTarget = target;
+				dragEnter(ev, target);
+			}
+		}
 	}
 
-	function dragEnter(_ev: MouseEvent | Touch, target) {
+	function dragEnter(_ev: MouseEvent | Touch, target: HTMLDivElement) {
 		// swap items in data
-		if (grabbed && target != grabbed && target.classList.contains('item')) {
-			moveDatum(parseInt(grabbed.dataset.index), parseInt(target.dataset.index));
+		if (grabbed && target != grabbed && target?.classList.contains('item')) {
+			if (grabbed.dataset.index && target.dataset.index) {
+				moveDatum(parseInt(grabbed.dataset.index), parseInt(target.dataset.index));
+			}
 		}
 	}
 
@@ -61,7 +68,7 @@
 		data = [...data.slice(0, to), temp, ...data.slice(to)];
 	}
 
-	function release(_ev: MouseEvent | Touch) {
+	function release() {
 		grabbed = null;
 	}
 
@@ -101,11 +108,11 @@
 		}}
 		on:mouseup={function (ev) {
 			ev.stopPropagation();
-			release(ev);
+			release();
 		}}
 		on:touchend={function (ev) {
 			ev.stopPropagation();
-			release(ev.touches[0]);
+			release();
 		}}
 	>
 		{#each data as datum, i (datum.id ? datum.id : JSON.stringify(datum))}
@@ -138,7 +145,7 @@
 					<button
 						class="up"
 						style={'visibility: ' + (i > 0 ? '' : 'hidden') + ';'}
-						on:click={function (ev) {
+						on:click={() => {
 							moveDatum(i, i - 1);
 						}}
 					>
@@ -151,7 +158,7 @@
 					<button
 						class="down"
 						style={'visibility: ' + (i < data.length - 1 ? '' : 'hidden') + ';'}
-						on:click={function (ev) {
+						on:click={() => {
 							moveDatum(i, i + 1);
 						}}
 					>
@@ -170,7 +177,7 @@
 				<div class="buttons delete">
 					{#if removesItems}
 						<button
-							on:click={function (ev) {
+							on:click={() => {
 								removeDatum(i);
 							}}
 						>
