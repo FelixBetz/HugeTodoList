@@ -7,6 +7,8 @@
 	import { Input } from 'sveltestrap/src';
 	export let data: TodoItem[] = [];
 
+	export let isOpenList = false;
+
 	let ghost: HTMLDivElement;
 	let grabbed: HTMLDivElement | null;
 
@@ -113,43 +115,44 @@
 		}}
 	>
 		{#each data as datum, i (datum.id ? datum.id : JSON.stringify(datum))}
-			<div
-				id={grabbed && (datum.id ? datum.id : JSON.stringify(datum)) == grabbed.dataset.id
-					? 'grabbed'
-					: ''}
-				class={"item" + (datum.isDone ? " itemIsDone": "")}
-				data-index={i}
-	
-				data-id={datum.id ? datum.id : JSON.stringify(datum)}
-				data-grabY="0"
-				on:mousedown={function (ev) {
-					if (this instanceof HTMLDivElement) {
-						grab(ev.clientY, this);
-					}
-				}}
-				on:touchstart={function (ev) {
-					if (this instanceof HTMLDivElement) {
-						grab(ev.touches[0].clientY, this);
-					}
-				}}
-				on:mouseenter={function (ev) {
-					ev.stopPropagation();
-					if (ev.target instanceof HTMLDivElement) {
-						dragEnter(ev, ev.target);
-					}
-				}}
-				on:touchmove={function (ev) {
-					ev.stopPropagation();
-					ev.preventDefault();
-					touchEnter(ev.touches[0]);
-				}}
-				animate:flip={{ duration: 200 }}
-			>
-				<Input type="checkbox" bind:checked={datum.isDone} />
+			<div animate:flip={{ duration: 200 }}>
+				{#if datum.isDone == isOpenList}
+					<div
+						id={grabbed && (datum.id ? datum.id : JSON.stringify(datum)) == grabbed.dataset.id
+							? 'grabbed'
+							: ''}
+						class={'item' + (datum.isDone ? ' itemIsDone' : '')}
+						data-index={i}
+						data-id={datum.id ? datum.id : JSON.stringify(datum)}
+						data-grabY="0"
+						on:mousedown={function (ev) {
+							if (this instanceof HTMLDivElement) {
+								grab(ev.clientY, this);
+							}
+						}}
+						on:touchstart={function (ev) {
+							if (this instanceof HTMLDivElement) {
+								grab(ev.touches[0].clientY, this);
+							}
+						}}
+						on:mouseenter={function (ev) {
+							ev.stopPropagation();
+							if (ev.target instanceof HTMLDivElement) {
+								dragEnter(ev, ev.target);
+							}
+						}}
+						on:touchmove={function (ev) {
+							ev.stopPropagation();
+							ev.preventDefault();
+							touchEnter(ev.touches[0]);
+						}}
+					>
+						<Input type="checkbox" bind:checked={datum.isDone} />
 
-				<div class="content">
-					<p>{datum.title}</p>
-				</div>
+						<div class="content">
+							<p>{datum.title} (id:{datum.id})</p>
+						</div>
+					</div>{/if}
 			</div>
 		{/each}
 	</div>
@@ -165,7 +168,7 @@
 		z-index: 5;
 	}
 
-	.itemIsDone{
+	.itemIsDone {
 		text-decoration: line-through;
 	}
 
@@ -178,7 +181,6 @@
 		border: 1px solid rgb(190, 190, 190);
 		border-radius: 2px;
 		user-select: none;
-
 	}
 
 	.item:not(#grabbed):not(#ghost) {
