@@ -20,7 +20,7 @@
 	}
 	const navItems: Links[] = [
 		{ label: 'Home', route: '/' },
-		{ label: 'todo', route: '/todo' },
+		{ label: 'todo', route: '/todoList' },
 		{ label: 'notifyTest', route: '/notifyTest' }
 	];
 </script>
