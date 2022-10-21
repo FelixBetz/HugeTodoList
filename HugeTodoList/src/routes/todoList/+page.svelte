@@ -3,12 +3,7 @@
 	import type { TodoItem } from '$lib/interfaces';
 	import { Container, Row, Col, Label, Input, FormGroup, Button } from 'sveltestrap/src';
 	import { onMount } from 'svelte';
-	let todos: TodoItem[] = [
-		/*	{ id: 0, title: 'Test0', description: '0', isDone: false, categoryId: 0 },
-		{ id: 1, title: 'Test1', description: '1', isDone: true, categoryId: 0 },
-		{ id: 2, title: 'Test2', description: '2', isDone: false, categoryId: 1 },
-		{ id: 3, title: 'Test3', description: '3', isDone: true, categoryId: 1 }*/
-	];
+	let todos: TodoItem[] = [];
 
 	onMount(() => {
 		readTodoListFromLocalStorage();
@@ -42,7 +37,8 @@
 			title: title,
 			description: '0',
 			isDone: false,
-			categoryId: 0
+			categoryId: 0,
+			modifiedDate: Date.now()
 		};
 		addTodoTitle = '';
 		writeTodoListToLocalStorage();
