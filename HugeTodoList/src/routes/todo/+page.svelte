@@ -30,7 +30,7 @@
 
 <Container>
 	<Row>
-		<Col sm="3">
+		<Col sm="4">
 			<Row>
 				<Col><h3>Open</h3></Col>
 			</Row>
@@ -38,7 +38,7 @@
 				<Col><DragDrop bind:data={todos} isOpenList={false} /></Col>
 			</Row>
 		</Col>
-		<Col sm="3">
+		<Col sm="4">
 			<Row>
 				<Col><h3>Done</h3></Col>
 			</Row>
@@ -46,8 +46,8 @@
 				<Col><DragDrop bind:data={todos} isOpenList={true} /></Col>
 			</Row>
 		</Col>
-		<Col sm="3" />
-		<Col sm="3">
+
+		<Col sm="4">
 			<Row>
 				<Col><h3>Add</h3></Col>
 			</Row>
