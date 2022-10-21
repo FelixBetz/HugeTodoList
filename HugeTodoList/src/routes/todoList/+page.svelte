@@ -16,10 +16,29 @@
 		return response;
 	}
 
+	async function syncTodoItems() {
+		todos = readTodoListFromLocalStorage();
+
+		await getServerTodos().then((res: TodoItem[]) => {
+			for (let i = 0; i < res.length; i++) {
+				let index = todos.findIndex((todo) => todo.id == res[i].id);
+
+				//check if item exists in localStorage and on server
+				if (index > -1) {
+					//take item with latest modified date
+					if (todos[index].modifiedDate < res[i].modifiedDate) {
+						todos[i] = res[i];
+					}
+				} else {
+					//add server item to todoList
+					todos[todos.length] = res[i];
+				}
+			}
+		});
+	}
+
 	onMount(async () => {
-		let todosLocalStorage = readTodoListFromLocalStorage();
-		let todosServer = await getServerTodos();
-		todos = [...todosLocalStorage, ...todosServer];
+		await syncTodoItems();
 	});
 
 	function readTodoListFromLocalStorage(): TodoItem[] {
@@ -96,6 +115,7 @@
 					<FormGroup>
 						<Button color="primary" on:click={() => addTodoItem(addTodoTitle)}>Add Todo</Button>
 						<Button color="danger" on:click={clearLocalStorage}>Clear Local Storage</Button>
+						<Button color="danger" on:click={syncTodoItems}>sync</Button>
 					</FormGroup>
 				</Col>
 			</Row>
