@@ -5,18 +5,29 @@
 	import { onMount } from 'svelte';
 	let todos: TodoItem[] = [];
 
-	onMount(() => {
-		readTodoListFromLocalStorage();
+	async function getServerTodos(): Promise<TodoItem[]> {
+		const response = await fetch('/api/todos')
+			.then((res) => res.json())
+			.then((res: { todos: TodoItem[] }) => res['todos'])
+			.catch((error: Error) => {
+				console.log(error);
+				return [];
+			});
+		return response;
+	}
+
+	onMount(async () => {
+		let todosLocalStorage = readTodoListFromLocalStorage();
+		let todosServer = await getServerTodos();
+		todos = [...todosLocalStorage, ...todosServer];
 	});
 
-	function readTodoListFromLocalStorage() {
+	function readTodoListFromLocalStorage(): TodoItem[] {
 		let getTodos = localStorage.getItem('todoList');
 		if (getTodos !== null) {
-			let parsedTodos = JSON.parse(getTodos);
-			todos = parsedTodos;
-		} else {
-			todos = [];
+			return JSON.parse(getTodos);
 		}
+		return [];
 	}
 
 	function writeTodoListToLocalStorage() {
