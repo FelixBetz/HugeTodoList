@@ -7,4 +7,5 @@ export interface TodoItem {
     repeat: todo; */
 	isDone: boolean;
 	categoryId: number;
+	modifiedDate: number;
 }
