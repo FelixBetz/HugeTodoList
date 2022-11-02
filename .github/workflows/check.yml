@@ -14,7 +14,7 @@ jobs:
       uses: actions/setup-node@v3
     - name: Install dependencies
       run: |
-         cd HugeTodoList && npm install
+         cd HugeTodoList && npm install && npm i @prisma/client && npx prisma db push && npx prisma generate
     - name: Analysing the code with svelte check
       run: |
          cd HugeTodoList && npm run check
