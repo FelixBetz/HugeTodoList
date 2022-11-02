@@ -114,16 +114,17 @@
 			release();
 		}}
 	>
-		{#each data as datum, i (datum.id ? datum.id : JSON.stringify(datum))}
+		{#each data as datum, i (datum.createdDate ? datum.createdDate : JSON.stringify(datum))}
 			<div animate:flip={{ duration: 200 }}>
 				{#if datum.isDone == isOpenList}
 					<div
-						id={grabbed && (datum.id ? datum.id : JSON.stringify(datum)) == grabbed.dataset.id
+						id={grabbed &&
+						(datum.createdDate ? datum.createdDate : JSON.stringify(datum)) == grabbed.dataset.id
 							? 'grabbed'
 							: ''}
 						class={'item' + (datum.isDone ? ' itemIsDone' : '')}
 						data-index={i}
-						data-id={datum.id ? datum.id : JSON.stringify(datum)}
+						data-id={datum.createdDate ? datum.createdDate : JSON.stringify(datum)}
 						data-grabY="0"
 						on:mousedown={function (ev) {
 							if (this instanceof HTMLDivElement) {
@@ -150,7 +151,8 @@
 						<Input type="checkbox" bind:checked={datum.isDone} />
 
 						<div class="content">
-							<p>{datum.title} (id:{datum.id})</p>
+							<p>{datum.title} (id:{datum.createdDate})</p>
+							<p>databaseId: {datum.databaseId}</p>
 						</div>
 					</div>{/if}
 			</div>
