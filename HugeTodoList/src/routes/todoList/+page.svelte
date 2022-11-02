@@ -1,10 +1,13 @@
 <script lang="ts">
 	import DragDrop from '$lib/DragDrop.svelte';
 	import type { TodoItem } from '$lib/interfaces';
-	import { Container, Row, Col, Label, Input, FormGroup, Button } from 'sveltestrap/src';
-	import { onMount } from 'svelte';
-	let todos: TodoItem[] = [];
+	import { Progress, Container, Row, Col, Label, Input, FormGroup, Button } from 'sveltestrap/src';
+	import { onDestroy, onMount } from 'svelte';
 
+	let todos: TodoItem[] = [];
+	const TIMER_INTERVAL_MS = 600;
+	let progressBar = 0;
+	let intervall1s: ReturnType<typeof setInterval>;
 	let isInit = false;
 
 	async function getDatabaseTodos(): Promise<TodoItem[]> {
@@ -30,6 +33,14 @@
 		const content = await postRequest.json();
 
 		return content;
+	}
+
+	async function autoSyncCallback() {
+		progressBar += 1;
+		if (progressBar >= 100) {
+			await syncTodoItems();
+			progressBar = 0;
+		}
 	}
 
 	async function syncTodoItems() {
@@ -96,7 +107,11 @@
 
 	onMount(async () => {
 		await syncTodoItems();
-		setInterval(() => syncTodoItems(), 60 * 1000);
+		intervall1s = setInterval(autoSyncCallback, TIMER_INTERVAL_MS);
+	});
+
+	onDestroy(async () => {
+		clearInterval(intervall1s);
 	});
 
 	function readTodoListFromLocalStorage(): TodoItem[] {
@@ -135,8 +150,19 @@
 		await syncTodoItems();
 	}
 
+	async function forceSync() {
+		await syncTodoItems();
+		progressBar = 0;
+	}
+
 	let addTodoTitle = '';
 </script>
+
+<Row>
+	<Col>
+		<Progress value={progressBar} style="height: 2px" />
+	</Col>
+</Row>
 
 <Container>
 	<Row>
@@ -176,7 +202,7 @@
 					<FormGroup>
 						<Button color="primary" on:click={() => addTodoItem(addTodoTitle)}>Add Todo</Button>
 						<Button color="danger" on:click={clearLocalStorage}>Clear Local Storage</Button>
-						<Button color="danger" on:click={syncTodoItems}>sync</Button>
+						<Button color="danger" on:click={forceSync}>Force Sync</Button>
 						<Button
 							color="danger"
 							on:click={() => {
