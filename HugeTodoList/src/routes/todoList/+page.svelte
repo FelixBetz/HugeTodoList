@@ -5,7 +5,7 @@
 	import { onMount } from 'svelte';
 	let todos: TodoItem[] = [];
 
-	async function getServerTodos(): Promise<TodoItem[]> {
+	async function getDatabaseTodos(): Promise<TodoItem[]> {
 		const response = await fetch('/api/todos')
 			.then((res) => res.json())
 			.then((res: { todos: TodoItem[] }) => res['todos'])
@@ -16,25 +16,72 @@
 		return response;
 	}
 
+	async function postDatabaseTodo(todo: TodoItem) {
+		const postRequest = await fetch('/api/todos', {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(todo)
+		});
+		const content = await postRequest.json();
+
+		console.log(content);
+	}
+
 	async function syncTodoItems() {
-		todos = readTodoListFromLocalStorage();
+		todos = [];
+		let isLocalStorageChange = false;
 
-		await getServerTodos().then((res: TodoItem[]) => {
-			for (let i = 0; i < res.length; i++) {
-				let index = todos.findIndex((todo) => todo.createdId == res[i].createdId);
+		const localStorageTodos = readTodoListFromLocalStorage();
+		const databaseTodos = await getDatabaseTodos();
 
-				//check if item exists in localStorage and on server
-				if (index > -1) {
-					//take item with latest modified date
-					if (todos[index].modifiedDate < res[i].modifiedDate) {
-						todos[i] = res[i];
-					}
-				} else {
-					//add server item to todoList
-					todos[todos.length] = res[i];
+		//check if todoItem exists in localStorage AND in Database
+		for (const localStorageTodo of localStorageTodos) {
+			let index = databaseTodos.findIndex(
+				(databaseTodo) => databaseTodo.createdDate == localStorageTodo.createdDate
+			);
+
+			//todoItem exits in localStorage and database
+			if (index > -1) {
+				//localStorage and database are sync
+				if (localStorageTodo.modifiedDate == databaseTodos[index].modifiedDate) {
+					todos[todos.length] = localStorageTodo;
+				}
+				//localStorage is outdatet => take databaseItem
+				else if (localStorageTodo.modifiedDate < databaseTodos[index].modifiedDate) {
+					todos[todos.length] = databaseTodos[index];
+					isLocalStorageChange = true;
+				}
+
+				//database is outdatet => take localStorageItem
+				else if (localStorageTodo.modifiedDate > databaseTodos[index].modifiedDate) {
+					todos[todos.length] = localStorageTodo;
+					//todo update in Database
 				}
 			}
-		});
+			//todo Item only exists in local storage
+			else {
+				todos[todos.length] = localStorageTodo;
+				await postDatabaseTodo(localStorageTodo);
+			}
+		}
+
+		//check for items, which are only in database
+		for (const databaseTodo of databaseTodos) {
+			let compareIndex = localStorageTodos.findIndex(
+				(localStorageTodo) => localStorageTodo.createdDate == databaseTodo.createdDate
+			);
+			if (compareIndex == -1) {
+				todos[todos.length] = databaseTodo;
+				isLocalStorageChange = true;
+			}
+		}
+
+		if (isLocalStorageChange == true) {
+			writeTodoListToLocalStorage();
+		}
 	}
 
 	onMount(async () => {
@@ -49,7 +96,7 @@
 		return [];
 	}
 
-	function writeTodoListToLocalStorage() {
+	async function writeTodoListToLocalStorage() {
 		localStorage.setItem('todoList', JSON.stringify(todos));
 	}
 
@@ -58,28 +105,27 @@
 		readTodoListFromLocalStorage();
 	}
 
-	function addTodoItem(title: string) {
+	async function addTodoItem(title: string) {
 		if (title == '') {
 			return;
 		}
-		todos[todos.length] = {
-			databaeId: 0,
-			createdId: Date.now(),
+		const todoItem: TodoItem = {
+			databaseId: 0,
+			createdDate: Date.now(),
 			title: title,
 			description: '0',
 			isDone: false,
 			modifiedDate: Date.now()
 		};
+		todos[todos.length] = todoItem;
 		addTodoTitle = '';
-		writeTodoListToLocalStorage();
+		await writeTodoListToLocalStorage();
+		await postDatabaseTodo(todoItem);
+		await syncTodoItems();
 	}
 
 	let addTodoTitle = '';
 </script>
-
-<form action="/api/items" method="GET">
-	<button>Get Items</button>
-</form>
 
 <Container>
 	<Row>

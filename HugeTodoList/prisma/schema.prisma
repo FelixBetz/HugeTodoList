@@ -8,12 +8,12 @@ datasource db {
 }
 
 
-model TodoItem {
+model Todo {
   databaseId     Int     @id @default(autoincrement())
-  createdId Int @unique
+  createdDate BigInt @unique
   title  String  
   description String
   isDone   Boolean
-  modifiedDate  Int
+  modifiedDate  BigInt
 }
 

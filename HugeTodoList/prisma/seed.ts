@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 function getTodoItems() {
 	return [
 		{
-			createdId: 0,
+			createdDate: 0,
 			title: 'Test1',
 			description: `SvelteKit is lit. 🔥`,
 			isDone: false,
@@ -20,7 +20,7 @@ async function seed() {
 	const todos = getTodoItems();
 
 	for (const todo of todos) {
-		await prisma.todoItem.create({ data: todo });
+		await prisma.todo.create({ data: todo });
 	}
 }
 

@@ -1,12 +1,11 @@
 export interface TodoItem {
-	databaeId: number;
-	createdId: number;
+	databaseId: number;
+	createdDate: number;
 	title: string;
 	description: string;
-
+	isDone: boolean;
+	modifiedDate: number;
+	/*categoryId: number;*/
 	/*reminderDate: todo;
     repeat: todo; */
-	isDone: boolean;
-	/*categoryId: number;*/
-	modifiedDate: number;
 }
