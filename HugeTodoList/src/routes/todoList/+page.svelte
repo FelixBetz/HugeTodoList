@@ -166,6 +166,15 @@
 						<Button color="primary" on:click={() => addTodoItem(addTodoTitle)}>Add Todo</Button>
 						<Button color="danger" on:click={clearLocalStorage}>Clear Local Storage</Button>
 						<Button color="danger" on:click={syncTodoItems}>sync</Button>
+						<Button
+							color="danger"
+							on:click={() => {
+								const todo = todos[0];
+								todo.title = 'Hallo';
+								todo.modifiedDate = Date.now();
+								postDatabaseTodo(todos[0]);
+							}}>Update Test</Button
+						>
 					</FormGroup>
 				</Col>
 			</Row>

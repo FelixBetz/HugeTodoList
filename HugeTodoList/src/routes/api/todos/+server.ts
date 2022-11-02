@@ -29,16 +29,36 @@ export const GET: RequestHandler = async () => {
 export const POST: RequestHandler = async ({ request }) => {
 	const todo: TodoItem = await request.json();
 
-	// the user id is hardcoded but you can get it from a session
-	await prisma.todo.create({
-		data: {
-			createdDate: BigInt(todo.createdDate),
-			title: todo.title,
-			description: todo.description,
-			isDone: todo.isDone,
-			modifiedDate: BigInt(Date.now())
-		}
+	const getTodoItem = await prisma.todo.findUnique({
+		where: { createdDate: todo.createdDate }
 	});
+
+	//todo Item does not exist => create new one
+	if (getTodoItem == null) {
+		await prisma.todo.create({
+			data: {
+				createdDate: BigInt(todo.createdDate),
+				title: todo.title,
+				description: todo.description,
+				isDone: todo.isDone,
+				modifiedDate: BigInt(Date.now())
+			}
+		});
+	}
+	//update todo Item
+	else {
+		await prisma.todo.update({
+			where: { createdDate: todo.createdDate },
+			data: {
+				createdDate: BigInt(todo.createdDate),
+				title: todo.title,
+				description: todo.description,
+				isDone: todo.isDone,
+				modifiedDate: BigInt(todo.modifiedDate)
+			}
+		});
+	}
+
 	const retString = 'ok';
 	return json(retString);
 };
