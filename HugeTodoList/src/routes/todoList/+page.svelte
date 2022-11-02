@@ -5,6 +5,8 @@
 	import { onMount } from 'svelte';
 	let todos: TodoItem[] = [];
 
+	let isInit = false;
+
 	async function getDatabaseTodos(): Promise<TodoItem[]> {
 		const response = await fetch('/api/todos')
 			.then((res) => res.json())
@@ -31,8 +33,9 @@
 	}
 
 	async function syncTodoItems() {
-		todos = [];
+		let retTodos: TodoItem[] = [];
 		let isLocalStorageChange = false;
+		let isDatabaseChange = false;
 
 		const localStorageTodos = readTodoListFromLocalStorage();
 		const databaseTodos = await getDatabaseTodos();
@@ -47,24 +50,26 @@
 			if (index > -1) {
 				//localStorage and database are sync
 				if (localStorageTodo.modifiedDate == databaseTodos[index].modifiedDate) {
-					todos[todos.length] = localStorageTodo;
+					retTodos.push(localStorageTodo);
 				}
 				//localStorage is outdatet => take databaseItem
 				else if (localStorageTodo.modifiedDate < databaseTodos[index].modifiedDate) {
-					todos[todos.length] = databaseTodos[index];
+					retTodos.push(databaseTodos[index]);
 					isLocalStorageChange = true;
 				}
 
 				//database is outdatet => take localStorageItem
 				else if (localStorageTodo.modifiedDate > databaseTodos[index].modifiedDate) {
-					todos[todos.length] = localStorageTodo;
-					//todo update in Database
+					retTodos.push(localStorageTodo);
+					await postDatabaseTodo(localStorageTodo); //todo ret value
+					isDatabaseChange = true;
 				}
 			}
 			//todo Item only exists in local storage
 			else {
-				todos[todos.length] = localStorageTodo;
+				retTodos.push(localStorageTodo);
 				await postDatabaseTodo(localStorageTodo); //todo ret value
+				isDatabaseChange = true;
 			}
 		}
 
@@ -74,7 +79,7 @@
 				(localStorageTodo) => localStorageTodo.createdDate == databaseTodo.createdDate
 			);
 			if (compareIndex == -1) {
-				todos[todos.length] = databaseTodo;
+				retTodos.push(databaseTodo);
 				isLocalStorageChange = true;
 			}
 		}
@@ -82,10 +87,16 @@
 		if (isLocalStorageChange == true) {
 			writeTodoListToLocalStorage();
 		}
+
+		if (isDatabaseChange || isLocalStorageChange || !isInit) {
+			isInit = true;
+			todos = retTodos;
+		}
 	}
 
 	onMount(async () => {
 		await syncTodoItems();
+		setInterval(() => syncTodoItems(), 60 * 1000);
 	});
 
 	function readTodoListFromLocalStorage(): TodoItem[] {
