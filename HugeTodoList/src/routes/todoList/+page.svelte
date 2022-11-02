@@ -27,7 +27,7 @@
 		});
 		const content = await postRequest.json();
 
-		console.log(content);
+		return content;
 	}
 
 	async function syncTodoItems() {
@@ -64,7 +64,7 @@
 			//todo Item only exists in local storage
 			else {
 				todos[todos.length] = localStorageTodo;
-				await postDatabaseTodo(localStorageTodo);
+				await postDatabaseTodo(localStorageTodo); //todo ret value
 			}
 		}
 
@@ -120,7 +120,7 @@
 		todos[todos.length] = todoItem;
 		addTodoTitle = '';
 		await writeTodoListToLocalStorage();
-		await postDatabaseTodo(todoItem);
+		await postDatabaseTodo(todoItem); //todo ret value
 		await syncTodoItems();
 	}
 
