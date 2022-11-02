@@ -21,7 +21,7 @@
 
 		await getServerTodos().then((res: TodoItem[]) => {
 			for (let i = 0; i < res.length; i++) {
-				let index = todos.findIndex((todo) => todo.id == res[i].id);
+				let index = todos.findIndex((todo) => todo.createdId == res[i].createdId);
 
 				//check if item exists in localStorage and on server
 				if (index > -1) {
@@ -63,7 +63,7 @@
 			return;
 		}
 		todos[todos.length] = {
-			id: Date.now(),
+			createdId: Date.now(),
 			title: title,
 			description: '0',
 			isDone: false,
