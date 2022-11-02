@@ -1,4 +1,5 @@
 export interface TodoItem {
+	databaeId: number;
 	createdId: number;
 	title: string;
 	description: string;
@@ -6,6 +7,6 @@ export interface TodoItem {
 	/*reminderDate: todo;
     repeat: todo; */
 	isDone: boolean;
-	categoryId: number;
+	/*categoryId: number;*/
 	modifiedDate: number;
 }

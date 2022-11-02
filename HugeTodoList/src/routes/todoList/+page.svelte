@@ -63,11 +63,11 @@
 			return;
 		}
 		todos[todos.length] = {
+			databaeId: 0,
 			createdId: Date.now(),
 			title: title,
 			description: '0',
 			isDone: false,
-			categoryId: 0,
 			modifiedDate: Date.now()
 		};
 		addTodoTitle = '';
@@ -76,6 +76,10 @@
 
 	let addTodoTitle = '';
 </script>
+
+<form action="/api/items" method="GET">
+	<button>Get Items</button>
+</form>
 
 <Container>
 	<Row>

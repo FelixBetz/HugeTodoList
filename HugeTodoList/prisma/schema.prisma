@@ -9,13 +9,11 @@ datasource db {
 
 
 model TodoItem {
-  id     Int     @id @default(autoincrement())
+  databaseId     Int     @id @default(autoincrement())
   createdId Int @unique
   title  String  
   description String
   isDone   Boolean
-  categoryId Int
   modifiedDate  Int
-
 }
 
