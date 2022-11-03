@@ -15,6 +15,10 @@ jobs:
     - name: Install dependencies
       run: |
          cd HugeTodoList && npm install 
+    - name: create .env file
+      run : |
+         touch .env
+         echo DATABASE_URL="file:./dev.db" >> .env
     - name: prepare primsa database
       run: |
          cd HugeTodoList && npm i @prisma/client && npx prisma db push && npx prisma generate
