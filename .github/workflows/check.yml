@@ -15,6 +15,9 @@ jobs:
     - name: Install dependencies
       run: |
          cd HugeTodoList && npm install
+    - name: prepare primsa database
+      run: |
+         cd HugeTodoList && npx prisma db push && npx prisma generate
     - name: Analysing the code with svelte check
       run: |
          cd HugeTodoList && npm run check
