@@ -18,6 +18,7 @@ jobs:
     - name: create .env file
       run : |
          touch .env
+         cd HugeTodoList
          echo DATABASE_URL="file:./dev.db" >> .env
     - name: prepare primsa database
       run: |
