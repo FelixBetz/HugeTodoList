@@ -1,7 +1,17 @@
 <script lang="ts">
-	import DragDrop from '$lib/DragDrop.svelte';
 	import type { TodoItem } from '$lib/interfaces';
-	import { Progress, Container, Row, Col, Label, Input, FormGroup, Button } from 'sveltestrap/src';
+	import TodoItemComponent from '$lib/TodoItemComponent.svelte';
+	import {
+		Progress,
+		Container,
+		Row,
+		Col,
+		Label,
+		Input,
+		FormGroup,
+		Button,
+		Icon
+	} from 'sveltestrap/src';
 	import { onDestroy, onMount } from 'svelte';
 
 	let todos: TodoItem[] = [];
@@ -9,6 +19,8 @@
 	let progressBar = 0;
 	let intervall1s: ReturnType<typeof setInterval>;
 	let isInit = false;
+
+	let showIsDone = true;
 
 	async function getDatabaseTodos(): Promise<TodoItem[]> {
 		const response = await fetch('/api/todos')
@@ -172,20 +184,32 @@
 			</Row>
 			<Row>
 				<Col>
-					<DragDrop bind:data={todos} isOpenList={false} on:message={writeTodoListToLocalStorage} />
+					{#each todos as todo}
+						{#if !todo.isDone}
+							<TodoItemComponent bind:item={todo} on:checkChange={writeTodoListToLocalStorage} />
+						{/if}
+					{/each}
+
+					<Icon
+						name={showIsDone ? 'arrow-down' : 'arrow-right'}
+						onclick={() => {
+							showIsDone = !showIsDone;
+						}}
+					/>
+
+					Done:
+
+					{#if showIsDone}
+						{#each todos as todo}
+							{#if todo.isDone}
+								<TodoItemComponent bind:item={todo} on:checkChange={writeTodoListToLocalStorage} />
+							{/if}
+						{/each}
+					{/if}
 				</Col>
 			</Row>
 		</Col>
-		<Col sm="4">
-			<Row>
-				<Col><h3>Done</h3></Col>
-			</Row>
-			<Row>
-				<Col>
-					<DragDrop bind:data={todos} isOpenList={true} on:message={writeTodoListToLocalStorage} />
-				</Col>
-			</Row>
-		</Col>
+		<Col sm="4" />
 
 		<Col sm="4">
 			<Row>
@@ -201,21 +225,17 @@
 							id="title"
 							placeholder="title"
 							bind:value={addTodoTitle}
+							on:keydown={(e) => {
+								if (e.key === 'Enter') {
+									addTodoItem(addTodoTitle);
+								}
+							}}
 						/>
 					</FormGroup>
 					<FormGroup>
 						<Button color="primary" on:click={() => addTodoItem(addTodoTitle)}>Add Todo</Button>
 						<Button color="danger" on:click={clearLocalStorage}>Clear Local Storage</Button>
 						<Button color="danger" on:click={forceSync}>Force Sync</Button>
-						<Button
-							color="danger"
-							on:click={() => {
-								const todo = todos[0];
-								todo.title = 'Hallo';
-								todo.modifiedDate = Date.now();
-								postDatabaseTodo(todos[0]);
-							}}>Update Test</Button
-						>
 					</FormGroup>
 				</Col>
 			</Row>
