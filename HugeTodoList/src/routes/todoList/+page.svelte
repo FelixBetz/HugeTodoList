@@ -186,7 +186,7 @@
 				<Col>
 					{#each todos as todo}
 						{#if !todo.isDone}
-							<TodoItemComponent bind:item={todo} on:checkChange={writeTodoListToLocalStorage} />
+							<TodoItemComponent bind:item={todo} on:save={writeTodoListToLocalStorage} />
 						{/if}
 					{/each}
 
@@ -202,7 +202,7 @@
 					{#if showIsDone}
 						{#each todos as todo}
 							{#if todo.isDone}
-								<TodoItemComponent bind:item={todo} on:checkChange={writeTodoListToLocalStorage} />
+								<TodoItemComponent bind:item={todo} on:save={writeTodoListToLocalStorage} />
 							{/if}
 						{/each}
 					{/if}
