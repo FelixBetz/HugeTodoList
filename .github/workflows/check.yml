@@ -17,8 +17,8 @@ jobs:
          cd HugeTodoList && npm install 
     - name: create .env file
       run : |
-         touch .env
          cd HugeTodoList
+         touch .env
          echo DATABASE_URL="file:./dev.db" >> .env
     - name: prepare primsa database
       run: |

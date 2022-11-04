@@ -5,9 +5,18 @@
 	import { flip } from 'svelte/animate';
 	import type { TodoItem } from '$lib/interfaces';
 	import { Input } from 'sveltestrap/src';
-	export let data: TodoItem[] = [];
+	import { createEventDispatcher } from 'svelte';
 
+	export let data: TodoItem[] = [];
 	export let isOpenList = false;
+
+	const dispatch = createEventDispatcher();
+
+	function dispactchMessage(todo: TodoItem) {
+		dispatch('message', {
+			text: todo.title + ', ' + todo.createdDate.toString()
+		});
+	}
 
 	let ghost: HTMLDivElement;
 	let grabbed: HTMLDivElement | null;
@@ -148,11 +157,20 @@
 							touchEnter(ev.touches[0]);
 						}}
 					>
-						<Input type="checkbox" bind:checked={datum.isDone} />
+						<Input
+							type="checkbox"
+							bind:checked={datum.isDone}
+							on:change={() => {
+								datum.isDone = !datum.isDone;
+								datum.modifiedDate = Date.now();
+								dispactchMessage(datum);
+							}}
+						/>
 
 						<div class="content">
 							<p>{datum.title} (id:{datum.createdDate})</p>
-							<p>databaseId: {datum.databaseId}</p>
+							<p>modifiedDate: {new Date(datum.modifiedDate).toLocaleTimeString()}</p>
+							<p>modifiedDate: {datum.modifiedDate}</p>
 						</div>
 					</div>{/if}
 			</div>

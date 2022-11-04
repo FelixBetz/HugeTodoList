@@ -171,7 +171,9 @@
 				<Col><h3>Open</h3></Col>
 			</Row>
 			<Row>
-				<Col><DragDrop bind:data={todos} isOpenList={false} /></Col>
+				<Col>
+					<DragDrop bind:data={todos} isOpenList={false} on:message={writeTodoListToLocalStorage} />
+				</Col>
 			</Row>
 		</Col>
 		<Col sm="4">
@@ -179,7 +181,9 @@
 				<Col><h3>Done</h3></Col>
 			</Row>
 			<Row>
-				<Col><DragDrop bind:data={todos} isOpenList={true} /></Col>
+				<Col>
+					<DragDrop bind:data={todos} isOpenList={true} on:message={writeTodoListToLocalStorage} />
+				</Col>
 			</Row>
 		</Col>
 
