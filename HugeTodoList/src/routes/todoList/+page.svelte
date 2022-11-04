@@ -151,7 +151,7 @@
 			databaseId: 0,
 			createdDate: Date.now(),
 			title: title,
-			description: '0',
+			description: '',
 			isDone: false,
 			modifiedDate: Date.now()
 		};
